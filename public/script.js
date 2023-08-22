@@ -59,6 +59,36 @@ function suggestEmoji(message) {
 }
 
 
+// Listen for "keydown" event on the message input field
+messageInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent Enter from creating a new line
+        sendMessage();
+    }
+});
+
+// Handle sending messages including slash commands
+sendButton.addEventListener('click', sendMessage);
+
+// Function to send a message
+function sendMessage() {
+    const message = messageInput.value.trim();
+
+    if (message.startsWith('/clear')) {
+        chatMessages.innerHTML = ''; // Clear chat window
+    } else if (message.startsWith('/random')) {
+        if (message === '/random') {
+            const randomNumber = Math.floor(Math.random() * 100); // Generate a random number
+            const randomMessage = `The random number generated is '${randomNumber}' for this window.`;
+            const messageElement = createMessageElement(randomMessage);
+            chatMessages.appendChild(messageElement);
+        }
+    } else if (message !== '') {
+        socket.emit('message', message);
+    }
+
+    messageInput.value = ''; // Clear the input field
+}
 
 
 
@@ -98,7 +128,18 @@ socket.on('message', message => {
 
 
 
+
+
+
 // Scroll chat messages to bottom
 function scrollToBottom() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+
+function createMessageElement(message) {
+    const messageElement = document.createElement('div');
+    messageElement.className = 'message';
+    messageElement.textContent = message;
+    return messageElement;
 }
